@@ -228,10 +228,6 @@ rfc-editor/
 └── SPEC.md
 ```
 
-## Version
-
-0.1.0.1
-
 ## License
 
 MIT
