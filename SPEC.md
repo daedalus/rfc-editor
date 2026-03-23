@@ -3,7 +3,6 @@
 ## Project Overview
 
 - **Project Name**: rfc-editor
-- **Version**: 0.1.0.1
 - **Type**: Python Library
 - **Core Functionality**: A library to parse and edit all sections of RFC (Request for Comments) TXT documents
 - **Target Users**: Developers, technical writers, and editors working with RFC documents
