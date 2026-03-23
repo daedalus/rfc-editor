@@ -5,6 +5,7 @@ A Python library for parsing and editing RFC (Request for Comments) TXT document
 ## Features
 
 - Parse RFC TXT documents and extract all sections
+- Download RFCs directly from rfc-editor.org
 - Edit all RFC document sections including:
   - Title
   - Abstract
@@ -127,6 +128,64 @@ editor.save("output.txt")
 data = editor.to_dict()
 print(data["title"])
 print(data["sections"])
+print(data["rfc_number"])
+print(data["category"])
+```
+
+### Download RFC from the Internet
+
+```python
+from rfc_editor import download_rfc
+
+# Download RFC directly as string
+content = download_rfc(791)
+
+# Download and save to file
+download_rfc(791, "rfc791.txt")
+```
+
+Or use the editor's download method:
+
+```python
+from rfc_editor import RFCEditor
+
+editor = RFCEditor()
+doc = editor.download(791)  # Download and parse
+
+# Download and save to file first
+doc = editor.download(791, "rfc791.txt")
+```
+
+### Access Document Data Models
+
+```python
+# Direct access to document attributes
+print(doc.rfc_number)    # RFC number (e.g., "791")
+print(doc.category)      # e.g., "Standards Track"
+print(doc.title)         # RFC title
+print(doc.abstract)      # Abstract content
+print(doc.index)         # Index section (if present)
+
+# Access authors
+for author in doc.authors:
+    print(author.name)
+    print(author.organization)
+    print(author.email)
+    print(author.address)
+
+# Get section by number
+section = doc.get_section("1")
+print(section.number, section.title, section.content)
+```
+
+### Update Section Title
+
+```python
+# Update only the title of a section
+editor.update_section("1", title="New Introduction Title")
+
+# Update both title and content
+editor.update_section("1", title="New Title", content="New content...")
 ```
 
 ## Development

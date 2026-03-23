@@ -56,8 +56,9 @@ Based on RFC 7322 (RFC Style Guide), a standard RFC TXT document contains these 
 
 1. **Parse RFC TXT Document**
    - Load and parse RFC TXT files
-   - Identify and extract all sections
+   - Identify and extract all sections including Index
    - Handle various RFC formats (standards track, informational, etc.)
+   - Parse author information
 
 2. **Edit Sections**
    - Edit Title
@@ -68,7 +69,7 @@ Based on RFC 7322 (RFC Style Guide), a standard RFC TXT document contains these 
    - Edit Copyright Notice
    - Edit Table of Contents
    - Edit Introduction
-   - Edit any numbered section (1.x, 2.x, etc.)
+   - Edit any numbered section (1.x, 2.x, etc.) - title and/or content
    - Edit IANA Considerations
    - Edit Security Considerations
    - Edit References (Normative and Informative)
@@ -86,27 +87,48 @@ Based on RFC 7322 (RFC Style Guide), a standard RFC TXT document contains these 
    - Get Acknowledgements
    - Get Contributors
    - Get Author's Address
-   - Get Section by Title
+   - Get Section by Title (case-insensitive partial match)
+   - Get Section by Number
 
 ### Download RFC by ID
    - Download RFC from https://www.rfc-editor.org/rfc/rfc{NUMBER}.txt
-   - Returns the content as string or saves to file
+   - Standalone `download_rfc()` function returns content as string or saves to file
+   - `RFCEditor.download()` method downloads and parses in one step
    - Handle invalid RFC numbers
    - Handle network errors
    - Write modified RFC back to TXT format
    - Maintain proper formatting (72-char line width, etc.)
 
+### Export to Dictionary
+   - Convert document to dictionary with all sections
+   - Include RFC number, category, title, abstract
+   - Include all sections as dict objects
+   - Include authors, acknowledgements, contributors, index, authors_address
+
 ### Data Model
 
 - `RFCDocument`: Main class representing an RFC document
+  - Attributes: rfc_number, category, title, abstract, authors, status_of_memo, copyright_notice, toc, sections, acknowledgements, contributors, index, authors_address, raw_content
+  - Methods: get_section(number), get_section_by_title(title)
+
 - `RFCSection`: Represents a section with number, title, and content
+  - Methods: to_dict()
+
 - `RFCAuthor`: Represents an author with name, organization, email, address
+  - Methods: to_dict()
+
+- `RFCEditor`: Main editor class
+  - Methods: load(), parse(), download(), save(), to_dict()
+  - Getter methods for each section
+  - Setter methods for each section
+  - Section management: add_section(), update_section(), delete_section()
 
 ### User Interface
 
 The library provides:
 - A Python class `RFCEditor` with methods to load, edit, and save RFC documents
 - Property accessors for each section
+- Direct attribute access on RFCDocument
 - Type hints for better IDE support
 
 ## Acceptance Criteria
@@ -114,8 +136,10 @@ The library provides:
 1. Can load an RFC TXT file and parse all sections
 2. Can edit any section of the RFC document
 3. Can save the modified RFC preserving formatting
-4. All linting tools (flake8, ruff, black) pass without errors
-5. Comprehensive pytest test coverage
-6. Proper Python package structure with pyproject.toml
-7. README.md with usage examples
-8. .gitignore for Python projects
+4. Can download RFCs directly from rfc-editor.org
+5. Can export document to dictionary format
+6. All linting tools (flake8, ruff, black) pass without errors
+7. Comprehensive pytest test coverage
+8. Proper Python package structure with pyproject.toml
+9. README.md with usage examples
+10. .gitignore for Python projects
