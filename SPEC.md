@@ -88,7 +88,11 @@ Based on RFC 7322 (RFC Style Guide), a standard RFC TXT document contains these 
    - Get Author's Address
    - Get Section by Title
 
-3. **Save RFC Document**
+### Download RFC by ID
+   - Download RFC from https://www.rfc-editor.org/rfc/rfc{NUMBER}.txt
+   - Returns the content as string or saves to file
+   - Handle invalid RFC numbers
+   - Handle network errors
    - Write modified RFC back to TXT format
    - Maintain proper formatting (72-char line width, etc.)
 

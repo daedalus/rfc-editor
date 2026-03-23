@@ -6,6 +6,45 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import requests
+
+
+def download_rfc(
+    rfc_id: str | int, filepath: str | Path | None = None
+) -> str:
+    """Download an RFC by its ID from rfc-editor.org.
+
+    Args:
+        rfc_id: The RFC number (e.g., "791" or 791)
+        filepath: Optional path to save the file. If None, returns content as string.
+
+    Returns:
+        The RFC content as a string if filepath is None, otherwise empty string after saving.
+
+    Raises:
+        ValueError: If the RFC number is invalid.
+        requests.RequestException: If the download fails.
+    """
+    rfc_id_str = str(rfc_id).strip()
+    if not rfc_id_str.isdigit():
+        raise ValueError(
+            f"Invalid RFC number: {rfc_id}. Must be a positive integer."
+        )
+
+    url = f"https://www.rfc-editor.org/rfc/rfc{rfc_id_str}.txt"
+
+    response = requests.get(url, timeout=30)
+    response.raise_for_status()
+
+    content = response.text
+
+    if filepath is not None:
+        path = Path(filepath)
+        path.write_text(content, encoding="utf-8")
+        return ""
+
+    return content
+
 
 @dataclass
 class RFCAuthor:
@@ -90,6 +129,25 @@ class RFCEditor:
             raise FileNotFoundError(f"File not found: {filepath}")
 
         content = path.read_text(encoding="utf-8")
+        return self.parse(content)
+
+    def download(
+        self, rfc_id: str | int, filepath: str | Path | None = None
+    ) -> RFCDocument:
+        """Download an RFC by ID and parse its content.
+
+        Args:
+            rfc_id: The RFC number (e.g., "791" or 791)
+            filepath: Optional path to save the file before parsing.
+
+        Returns:
+            The parsed RFCDocument.
+
+        Raises:
+            ValueError: If the RFC number is invalid.
+            requests.RequestException: If the download fails.
+        """
+        content = download_rfc(rfc_id, filepath)
         return self.parse(content)
 
     def parse(self, content: str) -> RFCDocument:

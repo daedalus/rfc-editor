@@ -3,10 +3,11 @@
 import os
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
-from rfc_editor import RFCEditor
+from rfc_editor import RFCEditor, download_rfc
 
 SAMPLE_RFC_CONTENT = """RFC 1234 (Standards Track)
 
@@ -534,5 +535,107 @@ class TestRFCEditorRoundTrip:
             doc2 = editor2.load(temp_path)
             assert doc2.title == "Modified Title"
             assert doc2.rfc_number == "1234"
+        finally:
+            os.unlink(temp_path)
+
+
+class TestDownloadRFC:
+    """Tests for downloading RFCs from rfc-editor.org."""
+
+    @patch("rfc_editor.requests.get")
+    def test_download_rfc_returns_content(self, mock_get):
+        """Test downloading an RFC returns content as string."""
+        mock_response = mock_get.return_value
+        mock_response.text = "RFC 791 (Internet Standard)\n\nTitle\n\n"
+        mock_response.raise_for_status = lambda: None
+
+        content = download_rfc("791")
+        assert "RFC 791" in content
+
+    @patch("rfc_editor.requests.get")
+    def test_download_rfc_with_integer_id(self, mock_get):
+        """Test downloading RFC with integer ID."""
+        mock_response = mock_get.return_value
+        mock_response.text = "RFC 1 (Historical)\n\nTitle\n\n"
+        mock_response.raise_for_status = lambda: None
+
+        content = download_rfc(1)
+        assert "RFC 1" in content
+
+    @patch("rfc_editor.requests.get")
+    def test_download_rfc_saves_to_file(self, mock_get):
+        """Test downloading and saving to file."""
+        mock_response = mock_get.return_value
+        mock_response.text = "RFC 791 Content"
+        mock_response.raise_for_status = lambda: None
+
+        with tempfile.NamedTemporaryFile(
+            suffix=".txt", delete=False
+        ) as f:
+            temp_path = f.name
+
+        try:
+            result = download_rfc("791", temp_path)
+            assert result == ""
+            assert Path(temp_path).read_text() == "RFC 791 Content"
+        finally:
+            os.unlink(temp_path)
+
+    def test_download_rfc_invalid_id_non_digit(self):
+        """Test downloading with non-digit RFC ID raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid RFC number"):
+            download_rfc("abc")
+
+    def test_download_rfc_invalid_id_with_spaces(self):
+        """Test downloading with whitespace-only ID raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid RFC number"):
+            download_rfc("   ")
+
+    @patch("rfc_editor.requests.get")
+    def test_download_rfc_network_error(self, mock_get):
+        """Test network error raises exception."""
+        import requests as req
+
+        mock_get.side_effect = req.RequestException("Connection failed")
+
+        with pytest.raises(req.RequestException):
+            download_rfc("791")
+
+
+class TestRFCEditorDownload:
+    """Tests for RFCEditor.download method."""
+
+    @patch("rfc_editor.requests.get")
+    def test_editor_download(self, mock_get):
+        """Test RFCEditor.download method."""
+        mock_response = mock_get.return_value
+        mock_response.text = SAMPLE_RFC_CONTENT
+        mock_response.raise_for_status = lambda: None
+
+        editor = RFCEditor()
+        doc = editor.download("1234")
+
+        assert doc is not None
+        assert doc.rfc_number == "1234"
+        assert doc.category == "Standards Track"
+
+    @patch("rfc_editor.requests.get")
+    def test_editor_download_with_file(self, mock_get):
+        """Test RFCEditor.download saves to file."""
+        mock_response = mock_get.return_value
+        mock_response.text = SAMPLE_RFC_CONTENT
+        mock_response.raise_for_status = lambda: None
+
+        with tempfile.NamedTemporaryFile(
+            suffix=".txt", delete=False
+        ) as f:
+            temp_path = f.name
+
+        try:
+            editor = RFCEditor()
+            doc = editor.download("1234", temp_path)
+
+            assert doc is not None
+            assert Path(temp_path).read_text() == SAMPLE_RFC_CONTENT
         finally:
             os.unlink(temp_path)
