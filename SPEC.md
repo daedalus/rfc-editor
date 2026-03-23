@@ -77,6 +77,17 @@ Based on RFC 7322 (RFC Style Guide), a standard RFC TXT document contains these 
    - Edit Contributors
    - Edit Author's Address
 
+4. **Query Sections**
+   - Get Title
+   - Get Abstract
+   - Get Status of This Memo
+   - Get Copyright Notice (year and holders)
+   - Get Table of Contents
+   - Get Acknowledgements
+   - Get Contributors
+   - Get Author's Address
+   - Get Section by Title
+
 3. **Save RFC Document**
    - Write modified RFC back to TXT format
    - Maintain proper formatting (72-char line width, etc.)

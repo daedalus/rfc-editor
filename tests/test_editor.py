@@ -56,6 +56,14 @@ This section discusses security considerations relevant to this RFC.
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
 
+Acknowledgements
+
+Thanks to all reviewers.
+
+Contributors
+
+Jane Doe contributed significantly.
+
 Author's Address
 
 John Doe
@@ -125,6 +133,125 @@ class TestRFCEditorGetters:
         editor.parse(SAMPLE_RFC_CONTENT)
         assert editor.document is not None
         assert editor.document.rfc_number == "1234"
+
+    def test_get_title(self):
+        """Test getting the title."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        assert editor.get_title() == "Test RFC Title"
+
+    def test_get_title_no_document(self):
+        """Test getting title without loading a document."""
+        editor = RFCEditor()
+        with pytest.raises(ValueError, match="No document loaded"):
+            editor.get_title()
+
+    def test_get_abstract(self):
+        """Test getting the abstract."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        assert "abstract of the test RFC" in editor.get_abstract()
+
+    def test_get_abstract_no_document(self):
+        """Test getting abstract without loading a document."""
+        editor = RFCEditor()
+        with pytest.raises(ValueError, match="No document loaded"):
+            editor.get_abstract()
+
+    def test_get_status_of_memo(self):
+        """Test getting Status of This Memo."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        assert "Internet standards track" in editor.get_status_of_memo()
+
+    def test_get_status_of_memo_no_document(self):
+        """Test getting status without loading a document."""
+        editor = RFCEditor()
+        with pytest.raises(ValueError, match="No document loaded"):
+            editor.get_status_of_memo()
+
+    def test_get_copyright(self):
+        """Test getting copyright notice."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        year, holders = editor.get_copyright()
+        assert year == 2023
+        assert holders == "Example Corp"
+
+    def test_get_copyright_no_document(self):
+        """Test getting copyright without loading a document."""
+        editor = RFCEditor()
+        with pytest.raises(ValueError, match="No document loaded"):
+            editor.get_copyright()
+
+    def test_get_toc(self):
+        """Test getting Table of Contents."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        assert "1. Introduction" in editor.get_toc()
+
+    def test_get_toc_no_document(self):
+        """Test getting TOC without loading a document."""
+        editor = RFCEditor()
+        with pytest.raises(ValueError, match="No document loaded"):
+            editor.get_toc()
+
+    def test_get_acknowledgements(self):
+        """Test getting Acknowledgements."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        assert "reviewers" in editor.get_acknowledgements()
+
+    def test_get_acknowledgements_no_document(self):
+        """Test getting acknowledgements without loading a document."""
+        editor = RFCEditor()
+        with pytest.raises(ValueError, match="No document loaded"):
+            editor.get_acknowledgements()
+
+    def test_get_contributors(self):
+        """Test getting Contributors."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        assert "Jane Doe" in editor.get_contributors()
+
+    def test_get_contributors_no_document(self):
+        """Test getting contributors without loading a document."""
+        editor = RFCEditor()
+        with pytest.raises(ValueError, match="No document loaded"):
+            editor.get_contributors()
+
+    def test_get_authors_address(self):
+        """Test getting Author's Address."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        assert "John Doe" in editor.get_authors_address()
+
+    def test_get_authors_address_no_document(self):
+        """Test getting author address without loading a document."""
+        editor = RFCEditor()
+        with pytest.raises(ValueError, match="No document loaded"):
+            editor.get_authors_address()
+
+    def test_get_section_by_title(self):
+        """Test getting a section by its title."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        section = editor.get_section_by_title("Introduction")
+        assert section is not None
+        assert section.number == "1"
+        assert section.title == "Introduction"
+
+    def test_get_section_by_title_nonexistent(self):
+        """Test getting non-existent section by title."""
+        editor = RFCEditor()
+        editor.parse(SAMPLE_RFC_CONTENT)
+        assert editor.get_section_by_title("NonExistent") is None
+
+    def test_get_section_by_title_no_document(self):
+        """Test getting section without loading a document."""
+        editor = RFCEditor()
+        with pytest.raises(ValueError, match="No document loaded"):
+            editor.get_section_by_title("Introduction")
 
 
 class TestRFCEditorSetters:

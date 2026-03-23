@@ -334,6 +334,64 @@ class RFCEditor:
             raise ValueError(f"Section with title '{title}' not found")
         section.content = content
 
+    def get_title(self) -> str:
+        """Get the RFC title."""
+        if self.document is None:
+            raise ValueError("No document loaded")
+        return self.document.title
+
+    def get_abstract(self) -> str:
+        """Get the RFC abstract."""
+        if self.document is None:
+            raise ValueError("No document loaded")
+        return self.document.abstract
+
+    def get_status_of_memo(self) -> str:
+        """Get the Status of This Memo section."""
+        if self.document is None:
+            raise ValueError("No document loaded")
+        return self.document.status_of_memo
+
+    def get_copyright(self) -> tuple[int, str]:
+        """Get the copyright notice."""
+        if self.document is None:
+            raise ValueError("No document loaded")
+        notice = self.document.copyright_notice
+        match = re.match(r"Copyright \(c\) (\d+) (.+)", notice)
+        if match:
+            return (int(match.group(1)), match.group(2))
+        return (0, "")
+
+    def get_toc(self) -> str:
+        """Get the Table of Contents."""
+        if self.document is None:
+            raise ValueError("No document loaded")
+        return self.document.toc
+
+    def get_acknowledgements(self) -> str:
+        """Get the Acknowledgements section."""
+        if self.document is None:
+            raise ValueError("No document loaded")
+        return self.document.acknowledgements
+
+    def get_contributors(self) -> str:
+        """Get the Contributors section."""
+        if self.document is None:
+            raise ValueError("No document loaded")
+        return self.document.contributors
+
+    def get_authors_address(self) -> str:
+        """Get the Author's Address section."""
+        if self.document is None:
+            raise ValueError("No document loaded")
+        return self.document.authors_address
+
+    def get_section_by_title(self, title: str) -> RFCSection | None:
+        """Get a section by its title."""
+        if self.document is None:
+            raise ValueError("No document loaded")
+        return self.document.get_section_by_title(title)
+
     def _section_sort_key(self, number: str) -> tuple:
         """Generate a sort key for section numbers."""
         parts = number.split(".")

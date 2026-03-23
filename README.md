@@ -53,6 +53,37 @@ print(doc.title)      # RFC title
 print(doc.abstract)  # Abstract content
 ```
 
+### Query Sections
+
+```python
+# Get title
+title = editor.get_title()
+
+# Get abstract
+abstract = editor.get_abstract()
+
+# Get status of this memo
+status = editor.get_status_of_memo()
+
+# Get copyright (returns tuple of year and holders)
+year, holders = editor.get_copyright()
+
+# Get table of contents
+toc = editor.get_toc()
+
+# Get acknowledgements
+acknowledgements = editor.get_acknowledgements()
+
+# Get contributors
+contributors = editor.get_contributors()
+
+# Get author's address
+address = editor.get_authors_address()
+
+# Get section by title (returns RFCSection or None)
+section = editor.get_section_by_title("Introduction")
+```
+
 ### Edit Sections
 
 ```python
